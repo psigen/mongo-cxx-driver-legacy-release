@@ -4,5 +4,25 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+# Set the working directory to install into (from dh_auto_install defaults).
+export DESTDIR=debian/mongo-cxx-driver-legacy
+
+SCONS=scons
+
 %:
-	dh $@ 
+	dh $@
+
+override_dh_auto_build:
+	dh_auto_build
+	$(SCONS) --prefix=${CURDIR}/$(DESTDIR)/usr
+
+override_dh_auto_clean:
+	dh_auto_clean
+	$(SCONS) -c
+	rm -rf build/scons
+	rm -rf site_scons/buildscripts/*.pyc
+	rm -rf site_scons/site_tools/*.pyc
+
+override_dh_auto_install:
+	dh_auto_install
+	$(SCONS) install --prefix=${CURDIR}/$(DESTDIR)/usr
